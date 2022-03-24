@@ -1,5 +1,30 @@
-const myForm = document.querySelector("#myForm");
+const myForm = document.querySelector("#upload-salary-form");
 const uploadBtn = document.querySelector("#csvFile");
+const equationDisplay = document.querySelector("#regressionEquation");
+const followUp = document.querySelector("#follow-up");
+const enterOffer = document.querySelector("#enter-offer");
+// const offerAmount = document.querySelector("#offer-amount");
+
+
+
+function offerSubmitHandler(event){
+  event.preventDefault();
+  const department = document.querySelector("#department");
+  const offerAmount = document.querySelector("#offer-amount");
+  const yearsField = document.querySelector("#employee-years");
+  let bodyObj = {
+    amount: offerAmount.value,
+    department: department.value,
+    YearsExperience: yearsField.value
+  }
+
+  axios.post('/offer', bodyObj).then((res) =>{
+    alert(res.data)
+  }).catch((err) => {
+    alert(err);
+  })
+}
+
 
 myForm.addEventListener("submit", function(event){
     event.preventDefault();
@@ -45,23 +70,30 @@ myForm.addEventListener("submit", function(event){
         //This can be used to check that data is read correctly
         // console.log(data[0]["Salary\r"]);
         // document.write(JSON.stringify(data));
+        const yearsField = document.querySelector("#employee-years");
+        const departmentField = document.querySelector("#department");
+        let bodyObj = {
+          department: departmentField.value,
+          yearsExperience: yearsField.value,
+          salaryValues: salaryData
+        }
 
-        axios.post('/salaries', salaryData).then((res) => {
-            console.log(res.data);
-            buildModel(res.data);
+        axios.post('/salaries', bodyObj).then((res) => {
+            // console.log(res.data);
+            let {salaryValues, yearsExperience, department} = res.data;
+            console.log(salaryValues);
+            buildModel(salaryValues, yearsExperience, department);
         }).catch((err) =>{
             alert(err);
         })
     };
 
     reader.readAsText(input);
-
-
-
 });
 
+
 //Create the regression equation and plot
-function buildModel(values){
+function buildModel(values, yearsExperience, department){
     let years = [];
     let salary = [];
     //Create arrays for Years and Salary amounts
@@ -73,10 +105,31 @@ function buildModel(values){
     const regressor = createRegressor(years, salary);
   
     plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
-  
+    
+    let slope = regressor["slope"].toPrecision(6);
+    let y_int = regressor['y-intercept'].toPrecision(7);
+    let predictedSalary = Number(slope)*Number(yearsExperience)+Number(y_int);
     //write The equation on the screen
-    // document.getElementById('regressionEquation').innerHTML = "<b>Salary Prediction Equation: </b>" + String(regressor['slope']) + "X + " + String(regressor['intercept']);
+    equationDisplay.innerHTML = `<b>Salary Prediction Equation: </b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+    
+    // followUp.innerHTML = `<p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>`;
+
+    enterOffer.innerHTML = `<div id="offer-container">
+
+                              <form id=offer-form>
+                              <p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>
+                              <p class="response-offer">What salary would you like to offer the new employee?</p>
+                              <form id=offer-form>
+                                <input id="offer-amount" type="text" value="Offer Amount">
+                                <button id="offer-amount-submit" type="submit">Submit</button>
+                              </form>
+                            </div>`;
+    const offerSubmitBtn = document.querySelector("#offer-amount-submit");
+    offerSubmitBtn.addEventListener("click", offerSubmitHandler);
   }
+
+  
+
   
   function createRegressor(x_vals, y_vals){
     //Store equations data
@@ -142,7 +195,7 @@ function buildModel(values){
       },
       options: {
         maintainAspectRatio: false,
-        responsive: true,
+        responsive: false,
         scales: {
           y: {
             beginAtZero: true
@@ -151,4 +204,5 @@ function buildModel(values){
       }
     });
   }
+  
   

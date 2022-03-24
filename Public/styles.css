@@ -5,19 +5,12 @@
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-header {
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: darkslateblue;
-}
 main {
   display: flex;
   justify-content: center;
 }
 body {
-  background-color: antiquewhite;
+  background-color: whitesmoke;
 }
 
 form {
@@ -52,11 +45,38 @@ form h1 {
 }
 
 #regressionEquations {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
   margin-top: 20px;
   margin-bottom: 15px;
 }
 
 #regressionChart {
-  width: 512px;
+  display: flex;
+  flex-direction: column;
+  width: 500px;
   height: 256px;
+}
+
+#graph-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.instructions {
+  display: flex;
+  justify-content: center;
+}
+#follow-up {
+  display: flex;
+  width: 350px;
+  margin-top: 90px;
+  font-size: large;
 }
