@@ -4,52 +4,79 @@ const dropDownMenu = document.querySelector("#departments-drop-down");
 const populateBtn = document.querySelector("#populate-menu");
 const getChartBtn = document.querySelector("#request-charts");
 const equationDisplay = document.querySelector("#regression-equation-review");
+const removeDepartmentBtn = document.querySelector("#delete-data");
 
+let dropDownArray = [];
+let displayedDepartment = '';
 
 function populateDropDown(event){
     event.preventDefault();
-    // let departments = ['Software', 'Finance', 'Engineering'];
+
     axios.get('/drop-down').then((res) =>{
         let dropDownItems = res.data;
+
         dropDownItems.forEach((element) => {
+          // if(!dropDownArray.includes(element)){
+            
+          //   dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
+          //   dropDownArray.push(element);
+          //   console.log(dropDownArray);
+          // }
             dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
+            dropDownArray.push(element);
+            console.log(dropDownArray);
         })
     }).catch((err) => {
         console.log(err);
     })
 }
-
 populateBtn.addEventListener("click", populateDropDown);
 
 
 function getModel(event){
     event.preventDefault();
+    const chartArea = document.querySelector('.chart-area');
     let departmentChoice = dropDownMenu.options[dropDownMenu.selectedIndex];
-    let departmentParam = departmentChoice.value;
+    displayedDepartment = departmentChoice.value;
     let bodyObj = {
         department: departmentChoice.value
     }
-    axios.post('/get-chart', bodyObj).then((res) => {
+    if(!chartArea){
+      axios.post('/get-chart', bodyObj).then((res) => {
 
-        console.log(res.data);
-        // let years = [];
-        // let salary = [];
-        let values = res.data[0];
-        console.log(values);
+          console.log(res.data);
 
-        // for (let i = 0; i < values.length; i++){
-        //   years.push(Number(values[i]["YearsExperience"]));
-        //   salary.push(Number(values[i]["Salary"]));
-        // }
-        // console.log(years);
-        // console.log(salary);
-        buildModel(values);
-    }).catch((err) => {
-        console.log(err);
+          let values = res.data[0];
+          console.log(values);
+          buildModel(values);
+      }).catch((err) => {
+          console.log(err);
     })
+  }
 }
-
 getChartBtn.addEventListener("click", getModel);
+
+function removeData(event){
+  event.preventDefault();
+  if (dropDownArray.length === 0){
+    alert("No items have been selected to be deleted.");
+    return;
+  }
+  console.log(displayedDepartment);
+
+  console.log(dropDownArray)
+  axios.delete(`/${displayedDepartment}`).then((res) => {
+    console.log(res.data);
+  }).catch((err) => {console.log(err)})
+  for (let i = 0; i < dropDownArray.length; i++){
+    if(dropDownArray[i] === displayedDepartment){
+      dropDownArray.splice(i, 1);
+      console.log(dropDownArray);
+    }
+  }
+  dropDownMenu.innerHTML = '';
+}
+removeDepartmentBtn.addEventListener("click", removeData);
 
 
 //Create the regression equation and plot
@@ -68,28 +95,10 @@ function buildModel(values){
     
     let slope = regressor["slope"].toPrecision(6);
     let y_int = regressor['y-intercept'].toPrecision(7);
-    // let predictedSalary = Number(slope)*Number(yearsExperience)+Number(y_int);
     //write The equation on the screen
     equationDisplay.innerHTML = `<b>Salary Prediction Equation: </b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
     
-    // followUp.innerHTML = `<p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>`;
-
-    // enterOffer.innerHTML = `<div id="offer-container">
-
-    //                           <form id=offer-form>
-    //                           <p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>
-    //                           <p class="response-offer">What salary would you like to offer the new employee?</p>
-    //                           <form id=offer-form>
-    //                             <input id="offer-amount" type="text" value="Offer Amount">
-    //                             <button id="offer-amount-submit" type="submit">Submit</button>
-    //                           </form>
-    //                         </div>`;
-    // const offerSubmitBtn = document.querySelector("#offer-amount-submit");
-    // offerSubmitBtn.addEventListener("click", offerSubmitHandler);
   }
-
-  
-
   
   function createRegressor(x_vals, y_vals){
     //Store equations data
@@ -134,10 +143,17 @@ function buildModel(values){
     return regressor;
     
   }
-  
+ 
   function plotRegChart(x_vals, y_vals, y_hat, r2){
-    ctx = document.getElementById('regression-chart-review');
-    let mixedChart = new Chart(ctx, {
+
+    ctx = document.createElement('canvas');
+    ctx.className = "chart-area";
+    const graphContainer = document.querySelector('#graph-container');
+    graphContainer.appendChild(ctx);
+
+    
+ 
+    let regChart = new Chart(ctx, {
       data: {
         datasets: [{
           type: 'line',
@@ -163,6 +179,15 @@ function buildModel(values){
         }
       }
     });
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = `<button id="delete-button">Clear Graph</button>`;
+    let offerContainer = document.querySelector("#enter-offer");
+    graphContainer.appendChild(deleteBtn);
+    deleteBtn.addEventListener("click", ()=>{
+      regChart.reset();
+      deleteBtn.innerHTML = "";
+      graphContainer.innerHTML = "";
+    })
   }
   
   

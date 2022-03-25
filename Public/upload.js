@@ -81,7 +81,6 @@ myForm.addEventListener("submit", function(event){
         axios.post('/salaries', bodyObj).then((res) => {
             // console.log(res.data);
             let {salaryValues, yearsExperience, department} = res.data;
-            console.log(salaryValues);
             buildModel(salaryValues, yearsExperience, department);
         }).catch((err) =>{
             alert(err);
@@ -96,6 +95,7 @@ myForm.addEventListener("submit", function(event){
 function buildModel(values, yearsExperience, department){
     let years = [];
     let salary = [];
+
     //Create arrays for Years and Salary amounts
     for (let i = 0; i < values.length; i++){
       years.push(Number(values[i]["YearsExperience"]));
@@ -159,7 +159,7 @@ function buildModel(values, yearsExperience, department){
       y_hat.push(x_vals[i]*regressor['slope']+regressor['y-intercept']);
     }
     regressor['y_hat'] = y_hat;
-  
+    
     //Find R2 score
     let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
   
@@ -176,8 +176,14 @@ function buildModel(values, yearsExperience, department){
   }
   
   function plotRegChart(x_vals, y_vals, y_hat, r2){
-    ctx = document.getElementById('regressionChart');
-    let mixedChart = new Chart(ctx, {
+
+    ctx = document.createElement('canvas');
+    const graphContainer = document.querySelector('#graph-container');
+    graphContainer.appendChild(ctx);
+
+    
+ 
+    let regChart = new Chart(ctx, {
       data: {
         datasets: [{
           type: 'line',
@@ -203,6 +209,16 @@ function buildModel(values, yearsExperience, department){
         }
       }
     });
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = `<button id="delete-button">Clear Graph</button>`;
+    let offerContainer = document.querySelector("#enter-offer");
+    graphContainer.appendChild(deleteBtn);
+    deleteBtn.addEventListener("click", ()=>{
+      regChart.reset();
+      deleteBtn.innerHTML = "";
+      graphContainer.innerHTML = "";
+      offerContainer.innerHTML = "";
+    })
   }
   
   

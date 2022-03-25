@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { response } = require('express');
 const app = express();
 
 const salaryDataArray = [];
+const dropDownArray = [];
 
 app.use(express.json());
 app.use(cors());
+
 
 //Sort data before pushing to data array
 function objectSort(obj){
@@ -65,7 +66,6 @@ app.post('/get-chart', (req, res) =>{
         }
     })
     res.status(200).send(responseData);
-
 })
 
 app.post('/salaries', (req, res) => {
@@ -94,6 +94,22 @@ app.post('/offer', (req, res) => {
     })
     //console.log(salaryDataArray);
     res.status(200).send(`Offer has been submitted and employee's salary information has been added to the ${department} department's database.`);
+})
+
+app.delete('/:id', (req, res) => {
+
+    console.log(req.params);
+    let {id} = req.params;
+    console.log(id);
+    console.log(salaryDataArray);
+    for (let i = 0; i < salaryDataArray.length; i++){
+        if(salaryDataArray[i]["department"] === id){
+            console.log(`deleted the ${salaryDataArray[i]["department"]} department.`)
+            salaryDataArray.splice(i, 1);
+        }
+    }
+    console.log(salaryDataArray);
+    res.status(200).send("Data removed");
 })
 
 app.listen(3000, ()=> {
