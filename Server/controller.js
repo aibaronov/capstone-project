@@ -11,8 +11,7 @@ const sequelize = new Sequelize(process.env.CONNECTION_STRING, {
     }
 })
 
-
-const salaryDataArray = [];
+let salaryDataArray = [];
 
 module.exports ={
     seed: (req, res) =>{
@@ -21,13 +20,10 @@ module.exports ={
         
         create table salaries (
             department_id serial primary key,
-            department VARCHAR(40),
+            department VARCHAR(40) UNIQUE,
             years float8[100],
             salary_vals INTEGER[100]
         );
-        
-        INSERT INTO salaries (department, years, salary_vals)
-        VALUES('test department', ARRAY[1, 2, 3, 4, 5], ARRAY[10000, 11000, 12000, 13000, 14000]);
         
         `).then(()=>{
             console.log("DB Seeded!");
@@ -46,22 +42,22 @@ module.exports ={
         let salary = [];
 
     //Create arrays for Years and Salary amounts
-    for (let i = 0; i < salaryValues.length; i++){
-      years.push(Number(salaryValues[i]["YearsExperience"]));
-      salary.push(Number(salaryValues[i]["Salary"]));
-    }
+        for (let i = 0; i < salaryValues.length; i++){
+            years.push(Number(salaryValues[i]["YearsExperience"]));
+            salary.push(Number(salaryValues[i]["Salary"]));
+        }
 
-    // sequelize.query(`
-    //     INSERT INTO salaries (department, years, salary_vals)
-    //     VALUES('${department}', ARRAY[${years}], ARRAY[${salary}]);`)
-        let responseData = {department, yearsExperience, salaryValues};
-        salaryDataArray.push(departmentData);
-        res.status(200).send(responseData);
-        // res.status(200).send("Data Received");
+        // sequelize.query(`
+        //     INSERT INTO salaries (department, years, salary_vals)
+        //     VALUES('${department}', ARRAY[${years}], ARRAY[${salary}]);`)
+            let responseData = {department, yearsExperience, salaryValues};
+            salaryDataArray.push(departmentData);
+            res.status(200).send(responseData);
+            // res.status(200).send("Data Received");
      },
 
     postOffer: (req, res) => {
-        console.log(req.body);
+        // console.log(req.body);
         let {amount, department, YearsExperience} = req.body;
         let newSalaryData = {
             YearsExperience: YearsExperience,
@@ -82,26 +78,45 @@ module.exports ={
             }
 
         })
+        salaryDataArray = [];
         sequelize.query(`
             INSERT INTO salaries (department, years, salary_vals)
             VALUES('${department}', ARRAY[${yearsSorted}], ARRAY[${salariesSorted}]);
-            `);
+            `).then(dbRes => res.status(200).send(`Offer has been submitted and employee's salary information has been added to the ${department} department's database.`))
+            .catch((err) => res.send(`You've attempted to post the same department twice. Please delete the ${department} entry in the View Salary Charts section and try again.`));
+    },
 
+    getDropDown: (req, res) => {
+        sequelize.query(`
+            SELECT department FROM salaries`)
+            .then((dbRes) => {
+                console.log(dbRes[0]);
+                res.status(200).send(dbRes[0])
+            })
+            .catch((err) => console.log(err));
+    },
 
-        res.status(200).send(`Offer has been submitted and employee's salary information has been added to the ${department} department's database.`);
+    getChart: (req, res) =>{
+        let {department} = req.body;
+        sequelize.query(`
+            SELECT years, salary_vals FROM salaries
+            WHERE department = '${department}';`)
+            .then((dbRes) => {
+                res.status(200).send(dbRes[0]);
+            })
+            .catch((err) => console.log(err));
     }
 }
 //Sort the salary values object after each new entry is added.
 function objectSort(obj){
     let vals = obj.salaryValues;
     let length = vals.length;
-    
     for (let i = 0; i < length - 1; i++){
 
       if(Number(vals[i]["YearsExperience"]) > Number(vals[length-1]["YearsExperience"])){
-        let temp = vals[length-1];
-        vals[length-1] = vals[i];
-        vals[i] = temp;
+        let lastVal = vals[length-1];
+        vals.splice(i, 0, lastVal);
+        vals.pop();
         break;
       }
     }

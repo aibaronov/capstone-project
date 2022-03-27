@@ -19,6 +19,7 @@ function offerSubmitHandler(event){
   }
 
   axios.post('/offer', bodyObj).then((res) =>{
+    console.log(res.data);
     alert(res.data)
   }).catch((err) => {
     alert(err);

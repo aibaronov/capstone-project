@@ -13,15 +13,14 @@ function populateDropDown(event){
     event.preventDefault();
 
     axios.get('/drop-down').then((res) =>{
-        let dropDownItems = res.data;
-        console.log(dropDownArray);
-        dropDownItems.forEach((element) => {
-            if(!dropDownArray.includes(element)){
-              dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
-              dropDownArray.push(element);
+          res.data.forEach((element) => {
+            console.log(element["department"]);
+            if(!dropDownArray.includes(element["department"])){
+              dropDownMenu.innerHTML += `<option value="${element["department"]}">${element["department"]}</option>`;
+              dropDownArray.push(element["department"]);
               console.log(dropDownArray);
             }
-        })
+          })
     }).catch((err) => {
         console.log(err);
     })
@@ -39,10 +38,19 @@ function getModel(event){
     }
     if(!chartArea){
       axios.post('/get-chart', bodyObj).then((res) => {
-          console.log(res.data);
-          let values = res.data[0];
-          console.log(values);
-          buildModel(values);
+        console.log(res.data['0']['salary_vals']);
+        let salaryArray = res.data['0']['salary_vals'];
+        let yearsArray = res.data['0']['years'];
+        let values = [];
+        for (let i = 0; i < salaryArray.length; i++){
+          values.push({"years": yearsArray[i], "salary_vals": salaryArray[i]});
+        }
+        console.log(values);
+        buildModel(values);
+          // console.log(res.data);
+          // let values = res.data[0];
+          // console.log(values);
+          // buildModel(values);
       }).catch((err) => {
           console.log(err);
     })
@@ -79,8 +87,8 @@ function buildModel(values){
     let salary = [];
     //Create arrays for Years and Salary amounts
     for (let i = 0; i < values.length; i++){
-      years.push(Number(values[i]["YearsExperience"]));
-      salary.push(Number(values[i]["Salary"]));
+      years.push(Number(values[i]["years"]));
+      salary.push(Number(values[i]["salary_vals"]));
     }
     //Get the slope, intercept and R2 score
     const regressor = createRegressor(years, salary);
