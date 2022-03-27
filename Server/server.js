@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 const {SERVER_PORT} = process.env;
-const {seed, postSalaries, postOffer, getDropDown, getChart} = require('./controller.js');
+const {seed, postSalaries, postOffer, getDropDown, getChart, deleteEntry} = require('./controller.js');
 
 const salaryDataArray = [];
 const dropDownArray = [];
@@ -45,20 +45,7 @@ app.post('/salaries', postSalaries);
 
 app.post('/offer', postOffer);
 
-app.delete('/:id', (req, res) => {
-    console.log(req.params);
-    let {id} = req.params;
-    console.log(id);
-    console.log(salaryDataArray);
-    for (let i = 0; i < salaryDataArray.length; i++){
-        if(salaryDataArray[i]["department"] === id){
-            console.log(`deleted the ${salaryDataArray[i]["department"]} department.`)
-            salaryDataArray.splice(i, 1);
-        }
-    }
-    console.log(salaryDataArray);
-    res.status(200).send("Data removed");
-})
+app.delete('/:id', deleteEntry);
 
 app.listen(3000, ()=> {
     console.log(`Server is running on ${SERVER_PORT}`);

@@ -43,8 +43,8 @@ module.exports ={
 
     //Create arrays for Years and Salary amounts
         for (let i = 0; i < salaryValues.length; i++){
-            years.push(Number(salaryValues[i]["YearsExperience"]));
-            salary.push(Number(salaryValues[i]["Salary"]));
+            years.push(Number(salaryValues[i]["years"]));
+            salary.push(Number(salaryValues[i]["salary_vals"]));
         }
 
         // sequelize.query(`
@@ -60,8 +60,8 @@ module.exports ={
         // console.log(req.body);
         let {amount, department, YearsExperience} = req.body;
         let newSalaryData = {
-            YearsExperience: YearsExperience,
-            Salary: amount
+            years: YearsExperience,
+            salary_vals: amount
         }
         let yearsSorted = [];
         let salariesSorted = [];
@@ -70,9 +70,10 @@ module.exports ={
                 element.salaryValues.push(newSalaryData);
                 //sort data 
                 element = objectSort(element);
+                console.log(element);
                 for (let i = 0; i < element.salaryValues.length; i++){
-                    yearsSorted.push(Number(element.salaryValues[i]['YearsExperience']));
-                    salariesSorted.push(Number(element.salaryValues[i]['Salary']));
+                    yearsSorted.push(Number(element.salaryValues[i]['years']));
+                    salariesSorted.push(Number(element.salaryValues[i]['salary_vals']));
                 }
                 console.log(element);
             }
@@ -105,6 +106,26 @@ module.exports ={
                 res.status(200).send(dbRes[0]);
             })
             .catch((err) => console.log(err));
+    },
+
+    deleteEntry: (req, res) => {
+        console.log(req.params);
+        let {id} = req.params;
+        console.log(id);
+        console.log(salaryDataArray);
+        sequelize.query(`
+            DELETE FROM salaries
+            WHERE department = '${id}'`)
+            .then(() => res.status(200).send(id))
+            .catch((err) => console.log(err));
+        // for (let i = 0; i < salaryDataArray.length; i++){
+        //     if(salaryDataArray[i]["department"] === id){
+        //         console.log(`deleted the ${salaryDataArray[i]["department"]} department.`)
+        //         salaryDataArray.splice(i, 1);
+        //     }
+        // }
+        // console.log(salaryDataArray);
+        // res.status(200).send("Data removed");
     }
 }
 //Sort the salary values object after each new entry is added.
@@ -113,7 +134,7 @@ function objectSort(obj){
     let length = vals.length;
     for (let i = 0; i < length - 1; i++){
 
-      if(Number(vals[i]["YearsExperience"]) > Number(vals[length-1]["YearsExperience"])){
+      if(Number(vals[i]["years"]) > Number(vals[length-1]["years"])){
         let lastVal = vals[length-1];
         vals.splice(i, 0, lastVal);
         vals.pop();

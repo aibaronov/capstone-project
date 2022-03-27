@@ -16,7 +16,8 @@ function populateDropDown(event){
           res.data.forEach((element) => {
             console.log(element["department"]);
             if(!dropDownArray.includes(element["department"])){
-              dropDownMenu.innerHTML += `<option value="${element["department"]}">${element["department"]}</option>`;
+              
+              dropDownMenu.innerHTML += `<option id="${element["department"]}" value="${element["department"]}">${element["department"]}</option>`;
               dropDownArray.push(element["department"]);
               console.log(dropDownArray);
             }
@@ -64,11 +65,12 @@ function removeData(event){
     alert("No items have been selected to be deleted.");
     return;
   }
-  console.log(displayedDepartment);
 
-  console.log(dropDownArray)
   axios.delete(`/${displayedDepartment}`).then((res) => {
     console.log(res.data);
+    alert("Database Entry Deleted");
+    const removeElement = document.getElementById(`${res.data}`)
+    removeElement.remove();
   }).catch((err) => {console.log(err)})
   for (let i = 0; i < dropDownArray.length; i++){
     if(dropDownArray[i] === displayedDepartment){
@@ -76,7 +78,7 @@ function removeData(event){
       console.log(dropDownArray);
     }
   }
-  dropDownMenu.innerHTML = '';
+  //dropDownMenu.innerHTML = '';
 }
 removeDepartmentBtn.addEventListener("click", removeData);
 

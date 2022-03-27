@@ -69,9 +69,10 @@ myForm.addEventListener("submit", function(event){
 
         //Remove \r from the salary key
         for (let i = 0; i < salaryData.length; i++){
-            salaryData[i]['Salary'] = salaryData[i]['Salary\r']
-            delete salaryData[i]['Salary\r'];
+            salaryData[i]['salary_vals'] = salaryData[i]['salary_vals\r']
+            delete salaryData[i]['salary_vals\r'];
           }
+          console.log(salaryData);
         const yearsField = document.querySelector("#employee-years");
         const departmentField = document.querySelector("#department");
         let bodyObj = {
@@ -102,8 +103,8 @@ function buildModel(values, yearsExperience, department){
 
     //Create arrays for Years and Salary amounts
     for (let i = 0; i < values.length; i++){
-      years.push(Number(values[i]["YearsExperience"]));
-      salary.push(Number(values[i]["Salary"]));
+      years.push(Number(values[i]["years"]));
+      salary.push(Number(values[i]["salary_vals"]));
     }
     //Get the slope, intercept and R2 score
     const regressor = createRegressor(years, salary);
