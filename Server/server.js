@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
+const {SERVER_PORT} = process.env;
+const {seed, postSalaries, postOffer} = require('./controller.js');
 
 const salaryDataArray = [];
 const dropDownArray = [];
@@ -11,21 +14,24 @@ app.use(cors());
 
 
 //Sort data before pushing to data array
-function objectSort(obj){
-    let vals = obj.salaryValues;
-    let length = vals.length;
+// function objectSort(obj){
+//     let vals = obj.salaryValues;
+//     let length = vals.length;
     
-    for (let i = 0; i < length - 1; i++){
-      console.log(vals[i]["YearsExperience"]);
-      if(vals[i]["YearsExperience"] > vals[length-1]["YearsExperience"]){
-        vals.splice(i-1, 0, vals[length-1]);
-        vals.pop();
-        break;
-      }
-    }
-    obj.salaryValues = vals;
-    return obj;
-  }
+//     for (let i = 0; i < length - 1; i++){
+//       console.log(vals[i]["YearsExperience"]);
+//       if(vals[i]["YearsExperience"] > vals[length-1]["YearsExperience"]){
+//         vals.splice(i-1, 0, vals[length-1]);
+//         vals.pop();
+//         break;
+//       }
+//     }
+//     obj.salaryValues = vals;
+//     return obj;
+//   }
+//Dev
+// Run this seed command in POSTMAN
+app.post('/seed', seed);
 
 app.get('/upload', (req, res) => {
     res.sendFile(path.join(__dirname, "../public/upload.html"));
@@ -68,36 +74,29 @@ app.post('/get-chart', (req, res) =>{
     res.status(200).send(responseData);
 })
 
-app.post('/salaries', (req, res) => {
-    let{department, salaryValues, yearsExperience} = req.body;
-    let departmentData = {department, salaryValues};
-    console.log(departmentData);
-    let responseData = {department, yearsExperience, salaryValues};
-    salaryDataArray.push(departmentData);
-    res.status(200).send(responseData);
-    // res.status(200).send("Data Received");
-})
+app.post('/salaries', postSalaries);
 
-app.post('/offer', (req, res) => {
-    let {amount, department, YearsExperience} = req.body;
-    let newSalaryData = {
-        YearsExperience: YearsExperience,
-        Salary: amount
-    }
-    salaryDataArray.forEach((element) => {
-        if (element["department"] === department){
-            element.salaryValues.push(newSalaryData);
-            //sort data 
-            element = objectSort(element);
-            console.log(element);
-        }
-    })
-    //console.log(salaryDataArray);
-    res.status(200).send(`Offer has been submitted and employee's salary information has been added to the ${department} department's database.`);
-})
+app.post('/offer', postOffer);
+
+// (req, res) => {
+//     let {amount, department, YearsExperience} = req.body;
+//     let newSalaryData = {
+//         YearsExperience: YearsExperience,
+//         Salary: amount
+//     }
+//     salaryDataArray.forEach((element) => {
+//         if (element["department"] === department){
+//             element.salaryValues.push(newSalaryData);
+//             //sort data 
+//             element = objectSort(element);
+//             console.log(element);
+//         }
+//     })
+
+//     res.status(200).send(`Offer has been submitted and employee's salary information has been added to the ${department} department's database.`);
+// })
 
 app.delete('/:id', (req, res) => {
-
     console.log(req.params);
     let {id} = req.params;
     console.log(id);
@@ -113,5 +112,5 @@ app.delete('/:id', (req, res) => {
 })
 
 app.listen(3000, ()=> {
-    console.log("Server is running on port 3000");
+    console.log(`Server is running on ${SERVER_PORT}`);
 })

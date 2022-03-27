@@ -14,17 +14,13 @@ function populateDropDown(event){
 
     axios.get('/drop-down').then((res) =>{
         let dropDownItems = res.data;
-
+        console.log(dropDownArray);
         dropDownItems.forEach((element) => {
-          // if(!dropDownArray.includes(element)){
-            
-          //   dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
-          //   dropDownArray.push(element);
-          //   console.log(dropDownArray);
-          // }
-            dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
-            dropDownArray.push(element);
-            console.log(dropDownArray);
+            if(!dropDownArray.includes(element)){
+              dropDownMenu.innerHTML += `<option value="${element}">${element}</option>`;
+              dropDownArray.push(element);
+              console.log(dropDownArray);
+            }
         })
     }).catch((err) => {
         console.log(err);
@@ -43,9 +39,7 @@ function getModel(event){
     }
     if(!chartArea){
       axios.post('/get-chart', bodyObj).then((res) => {
-
           console.log(res.data);
-
           let values = res.data[0];
           console.log(values);
           buildModel(values);
@@ -90,13 +84,16 @@ function buildModel(values){
     }
     //Get the slope, intercept and R2 score
     const regressor = createRegressor(years, salary);
-  
-    plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
-    
     let slope = regressor["slope"].toPrecision(6);
     let y_int = regressor['y-intercept'].toPrecision(7);
-    //write The equation on the screen
+
+    const equationDisplay = document.createElement('h5');
+    const graphContainer = document.querySelector("#graph-container")
+  
     equationDisplay.innerHTML = `<b>Salary Prediction Equation: </b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+    graphContainer.appendChild(equationDisplay);
+
+    plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
     
   }
   
@@ -180,7 +177,8 @@ function buildModel(values){
       }
     });
     const deleteBtn = document.createElement("button");
-    deleteBtn.innerHTML = `<button id="delete-button">Clear Graph</button>`;
+    deleteBtn.id = 'delete-button';
+    deleteBtn.innerHTML = `Clear Graph`;
     let offerContainer = document.querySelector("#enter-offer");
     graphContainer.appendChild(deleteBtn);
     deleteBtn.addEventListener("click", ()=>{

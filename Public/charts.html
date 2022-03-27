@@ -14,15 +14,18 @@
     <title>View Previous Records</title>
 </head>
 <body>
-    <nav role="navigation" id="navigation-bar">
-        <li><a href="/charts">View Salary Charts</a></li>
-        <li><a href="/upload">Create Salary Chart</a></li>
-    </nav>
+    <div class="nav-container">         
+        <nav role="navigation" id="navigation-bar">
+            <ul>
+                <li><a href="/upload">Create Salary Chart</a></li>
+                <li class="last"><a href="/charts">View Salary Charts</a></li>
+            </ul>
+        </nav>
+    </div>
     <h1 class="instructions">Choose a previous salary chart</h1>
 
     <main>
         <form id="get-charts-form" type="submit">
-            <label class="drop-down">Choose a department</label>
             <button id="populate-menu">Populate Menu</button>
             <select id="departments-drop-down">
                 <!-- <option value="software">Software</option>
@@ -33,7 +36,7 @@
         </form>
 
         <div id="graph-container">
-            <h3 id="regression-equation-review"></h3>
+            <h3 id="regressionEquation"></h3>
         </div>
     </main>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

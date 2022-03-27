@@ -15,13 +15,16 @@
     
     <title>Upload Data</title>
 </head>
-<body>         
-
+<body>
+    <div class="nav-container">         
         <nav role="navigation" id="navigation-bar">
-            <li><a href="/charts">View Salary Charts</a></li>
-            <li><a href="/upload">Create Salary Chart</a></li>
+            <ul>
+                <li><a href="/upload">Create Salary Chart</a></li>
+                <li class="last"><a href="/charts">View Salary Charts</a></li>
+            </ul>
         </nav>
-        <h1 class="instructions">Please choose a file to Upload</h1><br>
+    </div>
+        <h1 class="instructions">New Employee Salary Prediction Tool</h1><br>
         <h6 class="instructions">Please upload a list of current employee salaries and years of experience</h6><br>
         <h6 class="instructions">Enter the new employees years of experience and department that they're applying for</h6>
         <main>
@@ -39,11 +42,9 @@
         </div>
         <!-- <div id="follow-up"></div> -->
         <div id="enter-offer"></div>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
 
     </main>
-
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="/upload-js"></script>
 </body>
 </html>

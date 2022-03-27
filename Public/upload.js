@@ -1,6 +1,6 @@
 const myForm = document.querySelector("#upload-salary-form");
 const uploadBtn = document.querySelector("#csvFile");
-const equationDisplay = document.querySelector("#regressionEquation");
+// const equationDisplay = document.querySelector("#regressionEquation");
 const followUp = document.querySelector("#follow-up");
 const enterOffer = document.querySelector("#enter-offer");
 // const offerAmount = document.querySelector("#offer-amount");
@@ -28,9 +28,13 @@ function offerSubmitHandler(event){
 
 myForm.addEventListener("submit", function(event){
     event.preventDefault();
+    const chartArea = document.querySelector('canvas');
+    if (chartArea){
+      alert("Please clear the previous chart before selecting a new one.");
+      return;
+    }
     const input = csvFile.files[0];
     const reader = new FileReader();
-
     function csvToArray(str, delimiter = ","){
         //Slice from start of text to the first \n
         //Use split to create an array from the string using ","
@@ -67,9 +71,6 @@ myForm.addEventListener("submit", function(event){
             salaryData[i]['Salary'] = salaryData[i]['Salary\r']
             delete salaryData[i]['Salary\r'];
           }
-        //This can be used to check that data is read correctly
-        // console.log(data[0]["Salary\r"]);
-        // document.write(JSON.stringify(data));
         const yearsField = document.querySelector("#employee-years");
         const departmentField = document.querySelector("#department");
         let bodyObj = {
@@ -77,7 +78,8 @@ myForm.addEventListener("submit", function(event){
           yearsExperience: yearsField.value,
           salaryValues: salaryData
         }
-
+;
+        
         axios.post('/salaries', bodyObj).then((res) => {
             // console.log(res.data);
             let {salaryValues, yearsExperience, department} = res.data;
@@ -85,6 +87,7 @@ myForm.addEventListener("submit", function(event){
         }).catch((err) =>{
             alert(err);
         })
+      
     };
 
     reader.readAsText(input);
@@ -103,21 +106,24 @@ function buildModel(values, yearsExperience, department){
     }
     //Get the slope, intercept and R2 score
     const regressor = createRegressor(years, salary);
-  
-    plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
-    
     let slope = regressor["slope"].toPrecision(6);
     let y_int = regressor['y-intercept'].toPrecision(7);
     let predictedSalary = Number(slope)*Number(yearsExperience)+Number(y_int);
-    //write The equation on the screen
-    equationDisplay.innerHTML = `<b>Salary Prediction Equation: </b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+
+    const equationDisplay = document.createElement('h5');
+    const graphContainer = document.querySelector("#graph-container")
+    equationDisplay.innerHTML = `<b>Salary Prediction Equation</b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+    graphContainer.appendChild(equationDisplay);
+  
+    plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
     
-    // followUp.innerHTML = `<p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>`;
+
+    //write The equation on the screen
 
     enterOffer.innerHTML = `<div id="offer-container">
 
                               <form id=offer-form>
-                              <p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary} per year while working for the ${department} department.</p>
+                              <p class="response-offer" id="response-information">The recommended salary for an employee with ${yearsExperience} of experience is $${predictedSalary.toPrecision(7)} per year while working for the ${department} department.</p>
                               <p class="response-offer">What salary would you like to offer the new employee?</p>
                               <form id=offer-form>
                                 <input id="offer-amount" type="text" value="Offer Amount">
@@ -210,7 +216,8 @@ function buildModel(values, yearsExperience, department){
       }
     });
     const deleteBtn = document.createElement("button");
-    deleteBtn.innerHTML = `<button id="delete-button">Clear Graph</button>`;
+    deleteBtn.id = 'delete-button';
+    deleteBtn.innerHTML = `Clear Graph`;
     let offerContainer = document.querySelector("#enter-offer");
     graphContainer.appendChild(deleteBtn);
     deleteBtn.addEventListener("click", ()=>{
