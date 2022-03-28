@@ -162,9 +162,16 @@ function buildModel(values, yearsExperience, department){
     regressor['y-intercept'] = y_int;
   
     //Get predicted values of y based on x values
+    const x_coordinates = [];
+    for (let i = 0; i < Math.ceil(x_vals[x_vals.length-1]); i++){
+      x_coordinates.push(i);
+    }
     let y_hat = [];
     for (let i = 0; i < x_vals.length; i++){
+      console.log(`x_vals[${i}]: ${x_vals[i]}`);
+      console.log(`y_hat: ${y_hat}`)
       y_hat.push(x_vals[i]*regressor['slope']+regressor['y-intercept']);
+      console.log(`y_hat: ${y_hat}`)
     }
     regressor['y_hat'] = y_hat;
     
@@ -179,8 +186,7 @@ function buildModel(values, yearsExperience, department){
   
     regressor['r2'] = r2;
   
-    return regressor;
-    
+    return regressor; 
   }
   
   function plotRegChart(x_vals, y_vals, y_hat, r2, slope, y_int){
@@ -188,20 +194,22 @@ function buildModel(values, yearsExperience, department){
     ctx = document.createElement('canvas');
     const graphContainer = document.querySelector('#graph-container');
     graphContainer.appendChild(ctx);
-
-    
- 
+    const x_coordinates = [0];
+    let counter = 0;
+    for (let i = 0; i < Math.ceil(x_vals.length-1); i++){
+      x_coordinates.push(counter+=0.5);
+    }
     let regChart = new Chart(ctx, {
       data: {
         datasets: [{
           type: 'line',
-          label: `Employee Salary Predictor`,
+          label: `Salary Predictor`,
           data: y_hat,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.2)'
       }, {
         type: 'scatter',
-      label: 'Values',
+      label: 'Actual Values',
       data: y_vals,
       backgroundColor: 'rb(0, 0, 0)',
       }], 

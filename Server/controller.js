@@ -19,6 +19,7 @@ module.exports ={
     seed: (req, res) =>{
         sequelize.query(`
         drop table if exists salaries;
+        drop table if exists users;
         
         create table salaries (
             department_id serial primary key,
@@ -26,6 +27,15 @@ module.exports ={
             years float8[100],
             salary_vals INTEGER[100]
         );
+
+        CREATE TABLE users (
+            user_id SERIAL PRIMARY KEY,
+            username VARCHAR(40),
+            first_name VARCHAR(40),
+            last_name VARCHAR(40),
+            email VARCHAR(40),
+            password_val VARCHAR(100)
+          );
         
         `).then(()=>{
             console.log("DB Seeded!");
@@ -40,19 +50,32 @@ module.exports ={
         console.log(req.body);
 
         const {username, password} = req.body;
+        // const existingPassword = bcryptjs.compareSync(password, )
+        sequelize.query(`
+            SELECT password_val FROM users
+            WHERE username = '${username}'`).
+            then((dbRes) => {
+                const existingPassword = bcryptjs.compareSync(password, dbRes[0][0].password_val);
+                if(existingPassword){
+                    res.status(200).send(dbRes[0]);
+                }
+                else{
+                    res.status(400).send('Incorrect Password');
+                }
+            });
 
-        for (let i = 0; i < users.length; i++){
-            const existingPassword = bcryptjs.compareSync(password, users[i].passwordHash);
-            console.log(existingPassword);
-            if(users[i].username === username && existingPassword){
-                let securedUser = {...users[i]};
-                delete securedUser.passwordHash;
-                return res.status(200).send(securedUser);
-            }
-            else{
-                return res.status(400).send("User not found");
-            }
-        }        
+        // for (let i = 0; i < users.length; i++){
+        //     const existingPassword = bcryptjs.compareSync(password, users[i].passwordHash);
+        //     console.log(existingPassword);
+        //     if(users[i].username === username && existingPassword){
+        //         let securedUser = {...users[i]};
+        //         delete securedUser.passwordHash;
+        //         return res.status(200).send(securedUser);
+        //     }
+        //     else{
+        //         return res.status(400).send("User not found");
+        //     }
+        // }        
     },
 
     register: (req, res) => {
@@ -62,9 +85,16 @@ module.exports ={
         const pinHash = bcryptjs.hashSync(password, salt);
         delete req.body.password;
         req.body.passwordHash = pinHash;
+        sequelize.query(`
+            INSERT INTO users(username, first_name, last_name, email, password_val)
+            VALUES('${username}', '${firstName}', '${lastName}', '${email}', '${pinHash}');
+            `).then((dbRes) => {
+                console.log('User added to DB!')
+                res.status(200).send(dbRes[0]);
+            })
+                .catch((err) => {console.log("Failed to add user to DB")});
         users.push(req.body);
         console.log(users);
-        res.status(200).send(req.body);
 
     },
 

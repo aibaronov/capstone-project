@@ -6,8 +6,8 @@ const login = body => axios.post('/login', body).then(
         window.location.href = '/upload'
     }).catch((err) => {
         console.log(err);
-        alert(err);
-    })
+        alert("Failed to log in");
+    });
 
 const register = body => axios.post('/register', body).
     then((res) => {
