@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 const {SERVER_PORT} = process.env;
-const {seed, postSalaries, postOffer, getDropDown, getChart, deleteEntry} = require('./controller.js');
+const {seed, postSalaries, postOffer, getDropDown, getChart, deleteEntry, login, register} = require('./controller.js');
 
 const salaryDataArray = [];
 const dropDownArray = [];
@@ -16,6 +16,14 @@ app.use(cors());
 //Dev
 // Run this seed command in POSTMAN
 app.post('/seed', seed);
+
+app.get('/', (req, res) =>{
+    res.sendFile(path.join(__dirname, "../public/index.html"))
+});
+
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/index.js"))
+});
 
 app.get('/upload', (req, res) => {
     res.sendFile(path.join(__dirname, "../public/upload.html"));
@@ -36,6 +44,10 @@ app.get('/styles', (req, res) => {
 app.get('/charts-js', (req, res) =>{
     res.sendFile(path.join(__dirname, "../public/charts.js"));
 })
+
+app.post('/login', login);
+
+app.post('/register', register);
 
 app.get('/drop-down', getDropDown);
 

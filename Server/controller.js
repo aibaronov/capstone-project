@@ -1,6 +1,8 @@
 require('dotenv').config();
 const {CONNECTION_STRING} = process.env;
 const Sequelize = require('sequelize');
+const bcryptjs = require("bcryptjs");
+
 
 const sequelize = new Sequelize(process.env.CONNECTION_STRING, {
     dialect: 'postgres',
@@ -12,7 +14,7 @@ const sequelize = new Sequelize(process.env.CONNECTION_STRING, {
 })
 
 let salaryDataArray = [];
-
+const users = [];
 module.exports ={
     seed: (req, res) =>{
         sequelize.query(`
@@ -31,6 +33,39 @@ module.exports ={
         }).catch((err) => {
             console.log('Error seeding DB', err)
         });
+    },
+
+    login: (req, res) => {
+        console.log("User attempting to log in");
+        console.log(req.body);
+
+        const {username, password} = req.body;
+
+        for (let i = 0; i < users.length; i++){
+            const existingPassword = bcryptjs.compareSync(password, users[i].passwordHash);
+            console.log(existingPassword);
+            if(users[i].username === username && existingPassword){
+                let securedUser = {...users[i]};
+                delete securedUser.passwordHash;
+                return res.status(200).send(securedUser);
+            }
+            else{
+                return res.status(400).send("User not found");
+            }
+        }        
+    },
+
+    register: (req, res) => {
+        console.log("User attempted to register");
+        const {username, firstName, lastName, email, password} = req.body;
+        const salt = bcryptjs.genSaltSync(5);
+        const pinHash = bcryptjs.hashSync(password, salt);
+        delete req.body.password;
+        req.body.passwordHash = pinHash;
+        users.push(req.body);
+        console.log(users);
+        res.status(200).send(req.body);
+
     },
 
     postSalaries: (req, res) => {
