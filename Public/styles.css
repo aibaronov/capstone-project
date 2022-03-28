@@ -64,9 +64,9 @@ form {
   align-items: center;
   padding: 30px;
   margin: 30px;
-  margin-top: 85px;
+  margin-top: 95px;
   border: solid black;
-  border-radius: 2%;
+  border-radius: 2%;S
 }
 form[id="offer-form"] {
   text-align: left;
@@ -119,6 +119,10 @@ label {
 .instructions {
   display: flex;
   justify-content: center;
+  margin: 5px;
+}
+#chart-instructions{
+  margin-bottom: 20px;
 }
 #follow-up {
   display: flex;
@@ -196,4 +200,12 @@ h6 {
 
 button[id="offer-amount-submit"] {
   margin-top: 10px;
+}
+
+#summary {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: 0.5em 0.5em 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }

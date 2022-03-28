@@ -113,8 +113,8 @@ function buildModel(values, yearsExperience, department){
     let predictedSalary = Number(slope)*Number(yearsExperience)+Number(y_int);
 
     const equationDisplay = document.createElement('h5');
-    const graphContainer = document.querySelector("#graph-container")
-    equationDisplay.innerHTML = `<b>Salary Prediction Equation</b> <br> <h6><strong>Salary = ${String(slope)}X + ${String(y_int)}</strong></h6>`
+    const graphContainer = document.querySelector("#graph-container");
+    equationDisplay.innerHTML = `<summary><b>Salary Prediction Equation</b> <br> <h6><strong>Salary = ${String(slope)}X + ${String(y_int)}</strong></h6></summary>`
     graphContainer.appendChild(equationDisplay);
   
     plotRegChart(years, salary, regressor['y_hat'], regressor['r2'], slope, y_int);
@@ -162,58 +162,73 @@ function buildModel(values, yearsExperience, department){
     regressor['y-intercept'] = y_int;
   
     //Get predicted values of y based on x values
-    const x_coordinates = [];
-    for (let i = 0; i < Math.ceil(x_vals[x_vals.length-1]); i++){
-      x_coordinates.push(i);
+    let x_coordinates = [0];
+    let counter = 0;
+    let coordLength = Math.ceil(Number(x_vals[x_vals.length-1]))/.1;
+    for (let i = 0; i < coordLength; i++){
+      counter = counter += 0.1;
+      x_coordinates.push(counter.toPrecision(3));
     }
     let y_hat = [];
-    for (let i = 0; i < x_vals.length; i++){
-      console.log(`x_vals[${i}]: ${x_vals[i]}`);
-      console.log(`y_hat: ${y_hat}`)
-      y_hat.push(x_vals[i]*regressor['slope']+regressor['y-intercept']);
-      console.log(`y_hat: ${y_hat}`)
+    for (let i = 0; i < coordLength; i++){
+      // console.log(`x_vals[${i}]: ${x_vals[i]}`);
+      // console.log(`y_hat: ${y_hat}`)
+      y_hat.push(x_coordinates[i]*regressor['slope']+regressor['y-intercept']);
+      // console.log(`y_hat: ${y_hat}`)
     }
+    console.log(x_coordinates);
     regressor['y_hat'] = y_hat;
     
     //Find R2 score
-    let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
+    // let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
   
-    for(let i = 0; i < y_vals.length; i++){
-      residual_sum_squares += Math.pow((y_hat[i] - y_vals[i]), 2);
-      total_sum_squares += Math.pow((y_hat[i] - y_avg), 2);
-    }
-    r2 = 1 - residual_sum_squares/total_sum_squares;
+    // for(let i = 0; i < y_vals.length; i++){
+    //   residual_sum_squares += Math.pow((y_hat[i] - y_vals[i]), 2);
+    //   total_sum_squares += Math.pow((y_hat[i] - y_avg), 2);
+    // }
+    // // r2 = 1 - residual_sum_squares/total_sum_squares;
   
-    regressor['r2'] = r2;
+    // regressor['r2'] = r2;
   
     return regressor; 
   }
   
-  function plotRegChart(x_vals, y_vals, y_hat, r2, slope, y_int){
+  function plotRegChart(x_vals, y_vals, y_hat){
+    let x_coordinates = [0];
+    let counter = 0;
+    let coordLength = Math.ceil(Number(x_vals[x_vals.length-1]))/.1;
+    for (let i = 0; i < coordLength; i++){
+      counter += 0.1;
+      x_coordinates.push(counter.toPrecision(3));
+    }
 
+    const regression = [];
+    for (let i = 0; i < y_hat.length; i++){
+      regression.push({x:x_coordinates[i], y:y_hat[i]})
+    }
+
+    const data_vals = [];
+    for (let i = 0; i < y_vals.length; i++){
+      data_vals.push({x: x_vals[i].toPrecision(3), y: y_vals[i] });
+    }
     ctx = document.createElement('canvas');
     const graphContainer = document.querySelector('#graph-container');
     graphContainer.appendChild(ctx);
-    const x_coordinates = [0];
-    let counter = 0;
-    for (let i = 0; i < Math.ceil(x_vals.length-1); i++){
-      x_coordinates.push(counter+=0.5);
-    }
     let regChart = new Chart(ctx, {
       data: {
         datasets: [{
           type: 'line',
           label: `Salary Predictor`,
-          data: y_hat,
+          data: regression,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.2)'
       }, {
         type: 'scatter',
       label: 'Actual Values',
-      data: y_vals,
+     data: data_vals,
       backgroundColor: 'rb(0, 0, 0)',
       }], 
-       labels: x_vals
+       labels: x_coordinates
       },
       options: {
         scales: {    

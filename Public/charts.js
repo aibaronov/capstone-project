@@ -130,53 +130,83 @@ function buildModel(values){
     regressor['y-intercept'] = y_int;
   
     //Get predicted values of y based on x values
+    let x_coordinates = [0];
+    let counter = 0;
+    let coordLength = Math.ceil(Number(x_vals[x_vals.length-1]))/.1;
+    for (let i = 0; i < coordLength; i++){
+      counter = counter += 0.1;
+      x_coordinates.push(counter.toPrecision(3));
+    }
+
     let y_hat = [];
-    for (let i = 0; i < x_vals.length; i++){
-      y_hat.push(x_vals[i]*regressor['slope']+regressor['y-intercept']);
+    for (let i = 0; i < coordLength; i++){
+      y_hat.push(x_coordinates[i]*regressor['slope']+regressor['y-intercept']);
     }
     regressor['y_hat'] = y_hat;
   
     //Find R2 score
-    let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
+    // let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
   
-    for(let i = 0; i < y_vals.length; i++){
-      residual_sum_squares += Math.pow((y_hat[i] - y_vals[i]), 2);
-      total_sum_squares += Math.pow((y_hat[i] - y_avg), 2);
-    }
-    r2 = 1 - residual_sum_squares/total_sum_squares;
+    // for(let i = 0; i < y_vals.length; i++){
+    //   residual_sum_squares += Math.pow((y_hat[i] - y_vals[i]), 2);
+    //   total_sum_squares += Math.pow((y_hat[i] - y_avg), 2);
+    // }
+    // r2 = 1 - residual_sum_squares/total_sum_squares;
   
-    regressor['r2'] = r2;
+    // regressor['r2'] = r2;
   
     return regressor;
     
   }
  
-  function plotRegChart(x_vals, y_vals, y_hat, r2){
+  function plotRegChart(x_vals, y_vals, y_hat){
+    let x_coordinates = [0];
+    let counter = 0;
+    let coordLength = Math.ceil(Number(x_vals[x_vals.length-1]))/.1;
+    for (let i = 0; i < coordLength; i++){
+      counter += 0.1;
+      x_coordinates.push(counter.toPrecision(3));
+    }
+
+    const regression = [];
+    for (let i = 0; i < y_hat.length; i++){
+      regression.push({x:x_coordinates[i], y:y_hat[i]})
+    }
+
+    const data_vals = [];
+    for (let i = 0; i < y_vals.length; i++){
+      data_vals.push({x: x_vals[i].toPrecision(3), y: y_vals[i] });
+    }
 
     ctx = document.createElement('canvas');
     ctx.className = "chart-area";
     const graphContainer = document.querySelector('#graph-container');
     graphContainer.appendChild(ctx);
-
-    
- 
     let regChart = new Chart(ctx, {
       data: {
         datasets: [{
           type: 'line',
-          label: 'Employee Salary Predictor',
-          data: y_hat,
+          label: 'Salary Predictor',
+          data: regression,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.2)'
       }, {
         type: 'scatter',
-      label: 'Values',
-      data: y_vals,
+      label: 'Actual Values',
+      data: data_vals,
       backgroundColor: 'rb(0, 0, 0)',
       }], 
-       labels: x_vals
+       labels: x_coordinates
       },
       options: {
+        scales: {    
+          yAxes: [{
+              ticks: {
+                  fontSize: 100
+              }
+          }]
+      },
+      
         maintainAspectRatio: false,
         responsive: false,
         scales: {
