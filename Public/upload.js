@@ -114,10 +114,10 @@ function buildModel(values, yearsExperience, department){
 
     const equationDisplay = document.createElement('h5');
     const graphContainer = document.querySelector("#graph-container")
-    equationDisplay.innerHTML = `<b>Salary Prediction Equation</b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+    equationDisplay.innerHTML = `<b>Salary Prediction Equation</b> <br> <h6><strong>Salary = ${String(slope)}X + ${String(y_int)}</strong></h6>`
     graphContainer.appendChild(equationDisplay);
   
-    plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
+    plotRegChart(years, salary, regressor['y_hat'], regressor['r2'], slope, y_int);
     
 
     //write The equation on the screen
@@ -183,7 +183,7 @@ function buildModel(values, yearsExperience, department){
     
   }
   
-  function plotRegChart(x_vals, y_vals, y_hat, r2){
+  function plotRegChart(x_vals, y_vals, y_hat, r2, slope, y_int){
 
     ctx = document.createElement('canvas');
     const graphContainer = document.querySelector('#graph-container');
@@ -195,7 +195,7 @@ function buildModel(values, yearsExperience, department){
       data: {
         datasets: [{
           type: 'line',
-          label: 'Employee Salary Predictor',
+          label: `Employee Salary Predictor`,
           data: y_hat,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.2)'
@@ -208,6 +208,13 @@ function buildModel(values, yearsExperience, department){
        labels: x_vals
       },
       options: {
+        scales: {    
+          yAxes: [{
+              ticks: {
+                  fontSize: 100
+              }
+          }]
+      },
         maintainAspectRatio: false,
         responsive: false,
         scales: {
@@ -216,6 +223,7 @@ function buildModel(values, yearsExperience, department){
           }
         }
       }
+    
     });
     const deleteBtn = document.createElement("button");
     deleteBtn.id = 'delete-button';

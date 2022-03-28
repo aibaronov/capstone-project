@@ -100,7 +100,7 @@ function buildModel(values){
     const equationDisplay = document.createElement('h5');
     const graphContainer = document.querySelector("#graph-container")
   
-    equationDisplay.innerHTML = `<b>Salary Prediction Equation: </b> <br> <h6>Salary = ${String(slope)}*X + ${String(y_int)}</h6>`
+    equationDisplay.innerHTML = `<b>Salary Prediction Equation</b> <br> <h6><strong>Salary = ${String(slope)}X + ${String(y_int)}</strong></h6>`
     graphContainer.appendChild(equationDisplay);
 
     plotRegChart(years, salary, regressor['y_hat'], regressor['r2']);
