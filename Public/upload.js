@@ -179,17 +179,6 @@ function buildModel(values, yearsExperience, department){
     console.log(x_coordinates);
     regressor['y_hat'] = y_hat;
     
-    //Find R2 score
-    // let residual_sum_squares = 0, total_sum_squares = 0, r2 = 0;
-  
-    // for(let i = 0; i < y_vals.length; i++){
-    //   residual_sum_squares += Math.pow((y_hat[i] - y_vals[i]), 2);
-    //   total_sum_squares += Math.pow((y_hat[i] - y_avg), 2);
-    // }
-    // // r2 = 1 - residual_sum_squares/total_sum_squares;
-  
-    // regressor['r2'] = r2;
-  
     return regressor; 
   }
   

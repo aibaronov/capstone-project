@@ -48,10 +48,7 @@ function getModel(event){
         }
         console.log(values);
         buildModel(values);
-          // console.log(res.data);
-          // let values = res.data[0];
-          // console.log(values);
-          // buildModel(values);
+
       }).catch((err) => {
           console.log(err);
     })
