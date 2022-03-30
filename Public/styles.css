@@ -15,7 +15,7 @@ header {
 div[class="nav-container"] {
   background-color:cadetblue;
   padding-top: 60px;
-
+  border-bottom: 2px solid black;
   margin-top: 0px;
   margin-bottom: 50px;
 
@@ -26,10 +26,11 @@ ul {
   text-align: center;
   font-weight: 600;
   padding-bottom: 0;
-
+  margin-bottom: none;
 }
-a{
+.nav-container a{
   background-color: cadetblue;
+  text-decoration:none;
 }
 ul li {
 
