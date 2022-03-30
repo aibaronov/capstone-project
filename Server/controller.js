@@ -30,7 +30,7 @@ module.exports ={
 
         CREATE TABLE users (
             user_id SERIAL PRIMARY KEY,
-            username VARCHAR(40),
+            username VARCHAR(40) UNIQUE,
             first_name VARCHAR(40),
             last_name VARCHAR(40),
             email VARCHAR(40),
@@ -56,13 +56,19 @@ module.exports ={
             WHERE username = '${username}'`).
             then((dbRes) => {
                 const existingPassword = bcryptjs.compareSync(password, dbRes[0][0].password_val);
+              
+                console.log(existingPassword);
                 if(existingPassword){
-                    res.status(200).send(dbRes[0]);
-                }
-                else{
-                    res.status(400).send('Incorrect Password');
-                }
-            });
+                    return res.status(200).send(dbRes[0]);
+                     }
+                     else{
+                        return res.status(400).send("Failed to Log In");
+                     }
+                }).catch((err) => {
+                    res.status(400).send(err);
+                });
+                
+            // }).catch((err) => {res.status(400).send(err)});
 
         // for (let i = 0; i < users.length; i++){
         //     const existingPassword = bcryptjs.compareSync(password, users[i].passwordHash);

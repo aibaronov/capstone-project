@@ -46,10 +46,20 @@ function registerSubmitHandler(event){
     let password1 = document.querySelector("#password1");
     let password2 = document.querySelector("#password2");
 
-    if(password1.value !== password2.value){
-        alert("Password don't match");
-        return;
+    
+    let bodyArray = [username.value, firstName.value, lastName.value, email.value, password1.value, password2.value];
+    let validEntries = true;
+    bodyArray.forEach((element) => {
+    if(!element){
+        validEntries = false;
     }
+    });
+    console.log(validEntries);
+    if(password1.value !== password2.value || !validEntries){
+        alert("Please make sure all fields are entered and passwords match."); 
+        return;   
+    }
+    
 
     let bodyObj = {
         username: username.value,
